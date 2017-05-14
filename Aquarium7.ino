@@ -157,7 +157,7 @@ void setLightLevel(Time currentTime) {
     analogWrite(CIAN_LED_PWM, 255);
     analogWrite(WHITE_LED_PWM, 255);
     whiteLedBarsLightLevel(NUMBER_OF_WHITE_LED_BARS_ON_RELAY);
-   // fanSpeed(FAN_PWM_LIMIT);
+    // fanSpeed(FAN_PWM_LIMIT);
   };
   if (currentTime.hour >= firstSunsetHour && currentTime.hour < dayPauseHour) {
     t.hour = firstSunsetHour;
@@ -183,7 +183,7 @@ void setLightLevel(Time currentTime) {
     analogWrite(CIAN_LED_PWM, 0);
     analogWrite(WHITE_LED_PWM, 0);
     whiteLedBarsLightLevel(0);
-   // fanSpeed(0);
+    // fanSpeed(0);
   };
 
   //--- second sunrise block---
@@ -231,30 +231,28 @@ void setLightLevel(Time currentTime) {
       Serial.print("lightLevel on WHITE_LED_PWM to deduct from 255: ");
       Serial.println(lightLevel);
       analogWrite(WHITE_LED_PWM, 255 - lightLevel);
-//      fanSpeed(0);
+      //      fanSpeed(0);
+    }
+  } else {
+    if (currentTime.hour >= dayPauseHour && currentTime.hour < nightHour) {
+      noLight();
     }
   }
-  // Night befor 24 h
-  if (currentTime.hour >= nightHour) {
-    t.hour = 0;
-    Serial.println("It is night time now, light level: 0");
-    analogWrite(BLUE_LED_PWM, 0);
-    analogWrite(CIAN_LED_PWM, 0);
-    analogWrite(WHITE_LED_PWM, 0);
-    whiteLedBarsLightLevel(0);
-   // fanSpeed(0);
-  };
-  // Night after 0 h
-  if (currentTime.hour < firstSunriseHour) {
-    t.hour = 0;
-    Serial.println("It is night time now, light level: 0");
-    analogWrite(BLUE_LED_PWM, 0);
-    analogWrite(CIAN_LED_PWM, 0);
-    analogWrite(WHITE_LED_PWM, 0);
-    whiteLedBarsLightLevel(0);
-  //  fanSpeed(0);
+  // Night befor 24 h || Night after 0 h
+  if (currentTime.hour >= nightHour || currentTime.hour < firstSunriseHour) {
+    noLight();
   };
 };
+
+void noLight() {
+  t.hour = 0;
+  Serial.println("It is night time now, light level: 0");
+  analogWrite(BLUE_LED_PWM, 0);
+  analogWrite(CIAN_LED_PWM, 0);
+  analogWrite(WHITE_LED_PWM, 0);
+  whiteLedBarsLightLevel(0);
+  //  fanSpeed(0);
+}
 
 void fanSpeed(int lightLevel) {
   if (lightLevel < FAN_PWM_LIMIT) {
@@ -305,6 +303,4 @@ void whiteLedBarsLightLevel(int ledBarsNumber) {
       break;
   }
 };
-
-
 
